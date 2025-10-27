@@ -2,10 +2,7 @@ package base;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitUntilState;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -29,11 +26,12 @@ public class BaseClass {
         test = extent.createTest(method.getName());
 
         playwright = Playwright.create();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setChannel("chrome"));
-        page=browser.newPage();
-        page.setDefaultNavigationTimeout(60000);
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setChannel("chrome").setSlowMo(5000));
+        BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1920, 1080));
+        page=context.newPage();
+/*        page.setDefaultNavigationTimeout(60000);
         page.navigate("https://www.automationexercise.com/",
-                new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
+                new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));*/
     }
 
     @AfterMethod
