@@ -12,6 +12,12 @@ public class locatorsDemo extends BaseClass {
         page.navigate("https://trytestingthis.netlify.app/");
         // #id locator attribute
         page.locator("#fname").fill("Aravinth");
+        // xpath name attribute & value locator
+        page.locator("xpath=//input[@name='fname']").fill("Suruli");
+        // css name attribute & value locator
+        page.locator("css=input[name='fname']").fill("S");
+        // placeholder attribute & value locator
+        //page.getByPlaceholder("Text").fill("AA");
         // input name attribute & value locator
         page.locator("input[name='lname']").fill("S");
         //Radio button using value locator

@@ -2,6 +2,7 @@ package tests;
 
 import base.BaseClass;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import com.microsoft.playwright.options.WaitUntilState;
 import org.testng.annotations.Test;
 
@@ -12,5 +13,7 @@ public class FirstTest extends BaseClass {
         page.navigate("https://www.automationexercise.com/",
                 new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
         System.out.println("Page title is : "+page.title());
+        PlaywrightAssertions.assertThat(page).hasTitle("Automation Exercise");
+
     }
 }

@@ -16,11 +16,23 @@ public class ScreenshotUtil {
             }
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             String path = "test-output/screenshots/" + testName + "_" + timestamp + ".png";
-            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(path)).setFullPage(false));
-            return path;
+
+            page.screenshot(new Page.ScreenshotOptions()
+                    .setPath(Paths.get(path))
+                    .setFullPage(false));
+
+            return Paths.get(path).toAbsolutePath().toString();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static byte[] takeScreenshotUtility(Page page) {
+        SimpleDateFormat dateFormat= new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+        Date date= new Date();
+        String timestamp = dateFormat.format(date);
+        byte[] screenshot = page.screenshot(new Page.ScreenshotOptions().setFullPage(true).setPath(Paths.get("test-output/screenshots/screenshot_" + timestamp + ".png")));
+        return screenshot;
     }
 }
