@@ -11,28 +11,30 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class freelanceSignUp extends BaseClass {
     @Test
     public void SignUpTest() {
         page.navigate("https://freelance-learn-automation.vercel.app/login");
         page.getByText("New user? Signup").click();
-        PlaywrightAssertions.assertThat(page.locator("text=Learn Automation Courses").nth(0)).isVisible();
-        PlaywrightAssertions.assertThat(page.locator(".submit-btn")).isDisabled();
+        assertThat(page.locator("text=Learn Automation Courses").nth(0)).isVisible();
+        assertThat(page.locator(".submit-btn")).isDisabled();
         page.locator("#name").fill("Test User");
         page.getByPlaceholder("Email").fill("Automation"+System.currentTimeMillis()+"@gmail.com");
         page.getByPlaceholder("Password").fill("Test@1234");
         //page.getByPlaceholder("Password").type("Test", new Locator.TypeOptions().setDelay(100));
-        PlaywrightAssertions.assertThat(page.getByPlaceholder("Password")).hasValue("Test@1234");
-        PlaywrightAssertions.assertThat(page.getByPlaceholder("Password")).hasValue(Pattern.compile("Test"));
+        assertThat(page.getByPlaceholder("Password")).hasValue("Test@1234");
+        assertThat(page.getByPlaceholder("Password")).hasValue(Pattern.compile("Test"));
         //Pause for debugging
         //page.pause();
         page.locator("input[type='checkbox']").nth(4).check();
-        PlaywrightAssertions.assertThat(page.locator("input[type='checkbox']").nth(4)).isChecked();
+        assertThat(page.locator("input[type='checkbox']").nth(4)).isChecked();
         page.locator("input[value='Female']").click();
         page.locator("#state").selectOption("Goa");
         String hobbies[] = {"Playing", "Swimming"};
         page.locator("#hobbies").selectOption(hobbies);
-        PlaywrightAssertions.assertThat(page.locator(".submit-btn")).isEnabled();
+        assertThat(page.locator(".submit-btn")).isEnabled();
         page.locator(".submit-btn").click();
     }
     @Test
@@ -114,5 +116,15 @@ public class freelanceSignUp extends BaseClass {
        page.navigate("https://selectorshub.com/xpath-practice-page/");
        Locator shadowRoot=page.locator("div#userName");
         shadowRoot.locator("#kils").fill("Suruli Aravinth S");
+    }
+    @Test
+    public void HandlingWebTables(){
+        page.navigate("https://money.rediff.com/indices/nse/NIFTY-50?src=moneyhome_nseIndices");
+        //Row count
+        System.out.println(page.locator(".dataTable > tbody").locator("tr").count());
+        //col count
+        System.out.println(page.locator(".dataTable > tbody").locator("tr:first-child").locator("td").count());
+        assertThat(page.locator(".dataTable > tbody").locator("tr:first-child").locator("td:nth-child(2)")).hasText("Nifty");
+        page.locator(".dataTable > tbody").allInnerTexts().forEach(text -> System.out.println(text));
     }
 }

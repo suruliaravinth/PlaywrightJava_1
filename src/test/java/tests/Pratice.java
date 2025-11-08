@@ -1,9 +1,18 @@
 package tests;
 
 import base.BaseClass;
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.FrameLocator;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import org.testng.annotations.Test;
 import utils.ScreenshotUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Pratice extends BaseClass {
 
@@ -72,5 +81,54 @@ public class Pratice extends BaseClass {
         page.keyboard().down("Control");
         page.keyboard().press("v");
         page.keyboard().up("Control");*/
+    }
+    @Test
+    public void HandleSlidder(){
+        page.navigate("https://jqueryui.com/slider/");
+        FrameLocator frame = page.frameLocator(".demo-frame");
+        Locator slidder=frame.locator("//span[contains(@class,'ui-slider-handle')]");
+        slidder.focus();
+        for (int i=0;i<15;i++){
+            page.keyboard().press("ArrowRight");
+        }
+    }
+    @Test
+    public void downloadtest() throws IOException {
+        page.navigate("https://the-internet.herokuapp.com/download");
+        Download download = page.waitForDownload(() -> {
+            page.locator("//a[normalize-space()='TextFile.txt']").click();
+        });
+        String downloadPath = System.getProperty("user.dir")+ "/downloadfiles/" + download.suggestedFilename();
+        download.saveAs(Paths.get(downloadPath));
+        if (downloadPath.endsWith(".txt")){
+            System.out.println("File Extension verified");
+        }else {
+            System.out.println("File Extension failed");
+        }
+        if (Files.size(Path.of(downloadPath))>0){
+            System.out.println("File Size verified");
+        }else {
+            System.out.println("File size not verified");
+        }
+        String readFile = Files.readString(Path.of(downloadPath));
+        if (readFile.contains("sample test")){
+            System.out.println("File content verified");
+        }else {
+            System.out.println("File content not verified");
+        }
+    }
+    @Test
+    public void dynamicWait(){
+        page.navigate("https://seleniumpractise.blogspot.com/2016/08/how-to-use-explicit-wait-in-selenium.html");
+        page.locator("//button[@onclick='timedText()']").click();
+        page.locator("//p[text()='WebDriver']").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(20000));
+        System.out.println("Dynamic wait completed: "+page.locator("//p[text()='WebDriver']").isVisible());
+    }
+    @Test
+    public void JSExecutor(){
+        page.navigate("https://login.yahoo.com/");
+        //page.evaluate("document.getElementById(\"persistent\").click()");
+        Locator checkBox = page.locator("#persistent");
+        checkBox.evaluate("Checkbox => Checkbox.click()");
     }
 }
