@@ -6,6 +6,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.nio.file.Path;
 
 public class ScreenshotUtil {
     public static String takeScreenshot(Page page, String testName) {
@@ -28,11 +29,26 @@ public class ScreenshotUtil {
         }
     }
 
-    public static byte[] takeScreenshotUtility(Page page) {
-        SimpleDateFormat dateFormat= new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
-        Date date= new Date();
-        String timestamp = dateFormat.format(date);
-        byte[] screenshot = page.screenshot(new Page.ScreenshotOptions().setFullPage(true).setPath(Paths.get("test-output/screenshots/screenshot_" + timestamp + ".png")));
-        return screenshot;
+    public static byte[] takeScreenshotUtility(Page page, String testName) {
+        try {
+            File dir = new File("test-output/screenshots");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            String timestamp = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss").format(new Date());
+            String fileName = testName + "_" + timestamp + ".png";
+            Path path = Paths.get("test-output/screenshots", fileName);
+
+            // Single screenshot → save + get bytes
+            byte[] screenshotBytes = page.screenshot(
+                    new Page.ScreenshotOptions()
+                            .setFullPage(true)
+                            .setPath(path)
+            );
+            return screenshotBytes;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

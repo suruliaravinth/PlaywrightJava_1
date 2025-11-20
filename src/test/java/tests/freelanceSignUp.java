@@ -6,9 +6,12 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import org.testng.annotations.Test;
+import utils.ScreenshotUtil;
 
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -32,6 +35,11 @@ public class freelanceSignUp extends BaseClass {
         assertThat(page.locator("input[type='checkbox']").nth(4)).isChecked();
         page.locator("input[value='Female']").click();
         page.locator("#state").selectOption("Goa");
+        Locator options = page.locator("//select[@id='state']/option");
+        List<String> allTexts = options.allInnerTexts();
+        for (String text : allTexts) {
+            System.out.println(text);
+        }
         String hobbies[] = {"Playing", "Swimming"};
         page.locator("#hobbies").selectOption(hobbies);
         assertThat(page.locator(".submit-btn")).isEnabled();
@@ -54,9 +62,14 @@ public class freelanceSignUp extends BaseClass {
         }
     }
     @Test
-    public void fileUploadTest(){
+    public void fileUploadTest(Method method){
         page.navigate("https://trytestingthis.netlify.app/");
         page.locator("#myfile").setInputFiles(Path.of(System.getProperty("user.dir")+"/Files/Sample.png"));
+        //page.setInputFiles("#myfile",Paths.get(System.getProperty("user.dir")+"/Files/Sample.png"));
+        ScreenshotUtil.takeScreenshotUtility(page,method.getName() + "_before");
+        page.setInputFiles("#myfile",new Path[0]);
+        page.waitForTimeout(3000);
+        ScreenshotUtil.takeScreenshotUtility(page,method.getName() + "_after");
     }
 
     @Test
@@ -108,7 +121,8 @@ public class freelanceSignUp extends BaseClass {
         newPage.waitForTimeout(3000);
         String resultText = newPage.locator("#output").textContent();
         System.out.println("Result on page: " + resultText);
-        page.bringToFront();
+        newPage.bringToFront();
+        newPage.waitForTimeout(5000);
     }
 
     @Test
