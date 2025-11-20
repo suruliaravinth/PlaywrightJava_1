@@ -1,15 +1,13 @@
 package tests;
 
 import base.BaseClass;
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.FrameLocator;
-import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import utils.ScreenshotUtil;
-
-import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +25,7 @@ public class Pratice extends BaseClass {
         page.onDialog(dialog -> {
             System.out.println("Alert message: " + dialog.message());
             dialog.accept();
+            //dialog.dismiss();
         });
         page.locator("button[onclick='alertfunction()']").click();
         Thread.sleep(5000);
@@ -38,7 +37,9 @@ public class Pratice extends BaseClass {
         //FrameLocator frame = page.frameLocator("iframe[name='SingleFrame']");
         //frame.locator("input[type='text']").fill("sadsad");
         page.waitForTimeout(5000);
-        page.frameLocator("iframe[name='SingleFrame']").locator("input[type='text']").fill("sadsad");
+        Locator input=page.frameLocator("iframe[name='SingleFrame']").locator("input[type='text']");
+        input.fill("sadsad");
+        System.out.println("Entered value is :" +input.inputValue());
     }
 
     @Test
@@ -51,13 +52,13 @@ public class Pratice extends BaseClass {
         page.locator("//li[@id='menu-item-27583']//span[@class='menu-text'][normalize-space()='Selenium with Java']").click();
     }
     @Test
-    public void DragAndDrop() throws InterruptedException {
+    public void DragAndDrop(Method method) throws InterruptedException {
         page.navigate("https://trytestingthis.netlify.app/");
         Thread.sleep(5000);
-        ScreenshotUtil.takeScreenshotUtility(page);
+        ScreenshotUtil.takeScreenshotUtility(page,method.getName() + "_before");
         page.locator("//img[@id='drag1']").dragTo(page.locator("//div[@id='div1']"));
         Thread.sleep(5000);
-        ScreenshotUtil.takeScreenshotUtility(page);
+        ScreenshotUtil.takeScreenshotUtility(page,method.getName() + "_after");
     }
     @Test
     public void KeywordAction(){
@@ -96,7 +97,7 @@ public class Pratice extends BaseClass {
     public void downloadtest() throws IOException {
         page.navigate("https://the-internet.herokuapp.com/download");
         Download download = page.waitForDownload(() -> {
-            page.locator("//a[normalize-space()='TextFile.txt']").click();
+            page.locator("//a[normalize-space()='testfile.txt']").click();
         });
         String downloadPath = System.getProperty("user.dir")+ "/downloadfiles/" + download.suggestedFilename();
         download.saveAs(Paths.get(downloadPath));
@@ -130,5 +131,31 @@ public class Pratice extends BaseClass {
         //page.evaluate("document.getElementById(\"persistent\").click()");
         Locator checkBox = page.locator("#persistent");
         checkBox.evaluate("Checkbox => Checkbox.click()");
+    }
+    @Test
+    public void table(){
+        page.navigate("https://datatables.net/");
+        Locator locatorRow = page.locator("table#example tr");
+        locatorRow.locator(":scope",new Locator.LocatorOptions().setHasText("Ashton Cox")).locator(".select-checkbox").click();
+        locatorRow.locator(":scope").allInnerTexts().forEach(e->System.out.println(e));
+    }
+    @Test
+    public void Auth(){
+        page.navigate("https://www.automationexercise.com/");
+        page.locator("//a[normalize-space()='Signup / Login']").click();
+        page.locator("//input[@data-qa='login-email']").fill("sss.aravinth@gmail.com");
+        page.locator("[name=\"password\"]").fill("Suruli@30");
+        page.locator("button[data-qa='login-button']").click();
+        browserContext.storageState(new BrowserContext.StorageStateOptions().setPath(Paths.get("appLoginState.json")));
+    }
+    @Test
+    public void AuthLogin(){
+        browserContext= browser.newContext((new Browser.NewContextOptions().setViewportSize(null).setStorageStatePath(Paths.get("appLoginState.json"))));
+        page = browserContext.newPage();
+        page.navigate("https://www.automationexercise.com/");
+        System.out.println("Auth Login completed");
+        String actualResult = page.getByText("Logged in as Suruli Aravinth S").textContent().trim();
+        Assert.assertEquals(actualResult,"Logged in as Suruli Aravinth S");
+        System.out.println("Validation completed");
     }
 }
